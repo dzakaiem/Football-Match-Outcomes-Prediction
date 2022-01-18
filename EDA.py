@@ -28,7 +28,7 @@ print(whole_df.tail())
 
 # step 2 - cleaning the data - I HAVE DECIDED TO MAKE IT SO THAT THEMODEL PREDICTS 'WILL THE RESULT BE 'H' (HOME TEAM), 'A'(AWAY TEAM') OR 'D'(DRAW)
 
-irrelevant_features = ['Link', 'Away_Team', 'League']
+irrelevant_features = ['Link', 'League']
 for feature in irrelevant_features:
     whole_df = whole_df.drop (feature, axis = 1) #drop irrelevant columns
 
@@ -46,7 +46,8 @@ print (whole_df.shape)
 
 
 
-
+Home_goals = []
+Away_goals = []
 list_of_results= []
 #'1' - home win , '2' - away win , '3' - draw
 for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant anymore - index skips from 12292 to 12294
@@ -54,40 +55,42 @@ for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant 
       score = str(whole_df.loc[x,"Result"])
       print (score)  
       score_updated = score.split("-")
+      Home_goals.append (int(score_updated[0]))
+      Away_goals.append (int(score_updated[1]))
       print (score_updated)
       home = int(score_updated[0])
       away = int(score_updated[1])
       print (f'The home team scored {home} goals')
       print (f'The away team scored {away} goals') 
       if home > away:
-       list_of_results.append(1)
+       list_of_results.append('1')
       elif home < away:
-        list_of_results.append(2)
+        list_of_results.append('2')
       else:
-        list_of_results.append(3)
+        list_of_results.append('3')
 
 
 
-print (list_of_results) # now we need to add all these results into our new 'Outcome' column
+#print (list_of_results) # now we need to add all these results into our new 'Outcome' column
 
 whole_df['Outcome'] = list_of_results
+whole_df ['Home_goals'] = Home_goals
+whole_df ['Away_goals'] = Away_goals
+
+
+
+
 
 print (whole_df.tail())
 
+
 df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
-
-# remove 'Result' as now we are using a simplified version- 'Outcome' instead
-
-
-#print (whole_df.corr()) # useless as we only using it to find correlation of all the features with the target ('score') which can not be done here since 'score' isnt a plain number 
-#print (whole_df.columns) # ascertain column is dropped 
-
-#print (whole_df.isnull().sum()) # shows us how many null values per column- should be non in each
 
 
 
 # step 3 - analysing relationship between variables ('features') - lets calculate the pearson correlation co-efficient between the variables to decdie on elimination?
 
+print (whole_df.corr()) # infers week correlation with all- so do i drop all the vairables? (ie: not use any of these features)
 #correlations_matrix =  (whole_df.corr()) #gives a matrix of ALL correlation co-efficients between each variable (mor eeffcient than dfinding them seperately no?)
 #print (correlations_matrix.head()) #I THINK IT ONLY SHOWS BETWEEN SEASON AND ROUND COLUMNS (VARIABLES) AS THESE ONLY WITH SAME OBJECT TYPE TO COMPARE 
 
