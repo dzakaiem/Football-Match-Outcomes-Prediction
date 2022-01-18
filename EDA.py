@@ -5,24 +5,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 import os
 
+from sqlalchemy import true
+
 
 
 # step 1 - understanding the data
-# lets start with oNLY using all the premier league oness:
+# lets start with SOLELY using all the premier league data:
+
 data_set_names = os.listdir('/Users/danielzakaiem/Downloads/Football-Dataset/premier_league') # list of premier league names
 print (data_set_names)
-
 data_set_names = sorted(data_set_names) #puts list of data set names in order (from 1990-2021)
 my_list = [] 
 for data_set in data_set_names:
     my_list.append(pd.read_csv(f'/Users/danielzakaiem/Downloads/Football-Dataset/premier_league/{data_set}'))
     print (data_set)
 
-
-#my_list is now a list of pd's whcih we must concatenate i think 
-
-whole_df = pd.concat(my_list, ignore_index = True) # is the ENTIRE concatenated premier league datasets - added one below the other 
-
+whole_df = pd.concat(my_list, ignore_index = True) # ENTIRE concatenated premier league datasets - added one below the other 
 print (whole_df.head())
 print(whole_df.tail())
 
@@ -34,43 +32,51 @@ irrelevant_features = ['Link', 'Away_Team', 'League']
 for feature in irrelevant_features:
     whole_df = whole_df.drop (feature, axis = 1) #drop irrelevant columns
 
-# update result column values to '1' - home win , '2' - away win , '3' - draw
-# i would have to do this by : for each row, split score in to 2 numbers and use eqaulity command to see winner:
-count_row = whole_df.shape[0]  
-print (count_row)      # Gives number of rows- which is 12417
-#print (type(whole_df ['Result']))
-
-
-
-
-
 
 whole_df ['Outcome'] = np.nan # make new column with null values
 
-print (whole_df.tail()) # just to check out 
+whole_df['Index'] = np.arange(len(whole_df)) # add an index column 
+whole_df.set_index('Index') 
+
+
+
+print (whole_df.shape)
+whole_df = whole_df.drop(whole_df.index[12293]) # this should drop row with index 12293 (so now its missing from df) - '17 Jan' was written for the 'Result' - error in data
+print (whole_df.shape)  
+
+
+
 
 list_of_results= []
-
 #'1' - home win , '2' - away win , '3' - draw
-for x in range(12): #12417 rows appaz - change to this after...
-   score = str(whole_df.loc[x,"Result"])
-   print (score)  
-   score_updated = score.split("-")
-   home = int(score_updated[0])
-   away = int(score_updated[1])
-   print (f'The home team scored {home} goals')
-   print (f'The away team scored {away} goals')
-   if home > away:
-    list_of_results.append(1)
-   elif home < away:
-     list_of_results.append(2)
-   else:
-       list_of_results.append(3)
+for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant anymore - index skips from 12292 to 12294
+    if x != 12293:
+      score = str(whole_df.loc[x,"Result"])
+      print (score)  
+      score_updated = score.split("-")
+      print (score_updated)
+      home = int(score_updated[0])
+      away = int(score_updated[1])
+      print (f'The home team scored {home} goals')
+      print (f'The away team scored {away} goals') 
+      if home > away:
+       list_of_results.append(1)
+      elif home < away:
+        list_of_results.append(2)
+      else:
+        list_of_results.append(3)
 
-print (list_of_results)
-   
 
 
+print (list_of_results) # now we need to add all these results into our new 'Outcome' column
+
+whole_df['Outcome'] = list_of_results
+
+print (whole_df.tail())
+
+df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
+
+# remove 'Result' as now we are using a simplified version- 'Outcome' instead
 
 
 #print (whole_df.corr()) # useless as we only using it to find correlation of all the features with the target ('score') which can not be done here since 'score' isnt a plain number 
