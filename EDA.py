@@ -28,7 +28,7 @@ print(whole_df.tail())
 
 # step 2 - cleaning the data - I HAVE DECIDED TO MAKE IT SO THAT THEMODEL PREDICTS 'WILL THE RESULT BE 'H' (HOME TEAM), 'A'(AWAY TEAM') OR 'D'(DRAW)
 
-irrelevant_features = ['Link', 'League']
+irrelevant_features = ['League']
 for feature in irrelevant_features:
     whole_df = whole_df.drop (feature, axis = 1) #drop irrelevant columns
 
@@ -73,12 +73,9 @@ for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant 
 
 #print (list_of_results) # now we need to add all these results into our new 'Outcome' column
 
-whole_df['Outcome'] = list_of_results
+whole_df['Outcome'] = list_of_results # add these 3 new columns
 whole_df ['Home_goals'] = Home_goals
 whole_df ['Away_goals'] = Away_goals
-
-
-
 
 
 print (whole_df.tail())
