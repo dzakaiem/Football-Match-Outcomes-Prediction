@@ -2,13 +2,14 @@ from outcome import Outcome
 import pandas as pd
 from sklearn import preprocessing
 import numpy as np
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import train_test_split 
 from sklearn.preprocessing import scale
 from sklearn.tree import DecisionTreeClassifier 
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+import joblib
 
 
 df = pd.read_excel('/Users/danielzakaiem/Desktop/Football-Match-Outcomes-Prediction/ma_whole_df_newest.xlsx')
@@ -52,16 +53,30 @@ print (f'Testing: {len(y_test)}')
 # np.random.seed(2)
 
 models = [DecisionTreeClassifier(), SVC(), KNeighborsClassifier(n_neighbors=5)] 
-MSEs = []
+model_overview = []
 for model in models:
     model.fit( X_train, y_train) # the model 
 
     y_test_pred = model.predict (X_test) # y prediction
+    y_validation_prediction = model.predict (X_validation)
+    
     test_loss = mean_squared_error (y_test , y_test_pred)
-    print (f" For the {model} model, the mean squared error was: {test_loss} ")
-    MSEs.append((model,test_loss))
-print (MSEs)
+    validation_loss = mean_squared_error (y_validation, y_validation_prediction)
+   
+    test_accuracy = accuracy_score (y_test_pred, y_test)
+    validaiton_accuracy = accuracy_score (y_validation, y_validation_prediction)
+    
+    model_overview.append(
+     f"{model.__class__.__name__}: | Validation Loss: {validation_loss} | "
+        f"Test Loss: {test_loss}"
+    )
 
+print (model_overview)
+
+model = DecisionTreeClassifier().fit(X_train, y_train)
+joblib.dump(model, "model.joblib")
+
+#WAIT, I THOUGHT YOU HAVETO USE VALIDATION SET TO COMPARE MODELS?
 # 'best' model is DecisionTreeClassifier - which we will use
 
 
