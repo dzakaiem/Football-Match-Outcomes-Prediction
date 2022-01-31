@@ -11,13 +11,13 @@ from sqlalchemy import true
 
 data_set_names = os.listdir('/Users/danielzakaiem/Downloads/Football-Dataset/premier_league') # list of premier league names
 print (data_set_names)
-data_set_names = sorted(data_set_names) # puts list of data set names in order (from 1990-2021)
+data_set_names = sorted(data_set_names) 
 my_list = [] 
 for data_set in data_set_names:
     my_list.append(pd.read_csv(f'/Users/danielzakaiem/Downloads/Football-Dataset/premier_league/{data_set}'))
     print (data_set)
 
-whole_df = pd.concat(my_list, ignore_index = True) # ENTIRE concatenated premier league datasets - added one below the other 
+whole_df = pd.concat(my_list, ignore_index = True)  
 print (whole_df.head())
 print(whole_df.tail())
 
@@ -26,9 +26,9 @@ print(whole_df.tail())
 
 irrelevant_features = ['League']
 for feature in irrelevant_features:
-    whole_df = whole_df.drop (feature, axis = 1) # drop irrelevant columns
+    whole_df = whole_df.drop (feature, axis = 1)
 
-whole_df ['Outcome'] = np.nan # make new column with null values
+whole_df ['Outcome'] = np.nan 
 
 whole_df['Index'] = np.arange(len(whole_df)) # add an index column 
 whole_df.set_index('Index') 
@@ -61,9 +61,9 @@ for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant 
 
 
 
-# now we need to add all these results into new 'Outcome' column
+# add all these findings into new 'Outcome' column
 
-whole_df['Outcome'] = list_of_results # add these 3 new columns
+whole_df['Outcome'] = list_of_results 
 whole_df ['Home_goals'] = Home_goals
 whole_df ['Away_goals'] = Away_goals
 
