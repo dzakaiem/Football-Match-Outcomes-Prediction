@@ -6,7 +6,8 @@ import seaborn as sns
 import os
 from sqlalchemy import true
 
-# step 1 - understanding the data
+
+# step 1 - understand the data
 # start with only data for premier league
 
 data_set_names = os.listdir('/Users/danielzakaiem/Downloads/Football-Dataset/premier_league') # list of premier league names
@@ -22,13 +23,23 @@ print (whole_df.head())
 print(whole_df.tail())
 
 
-# step 2 - cleaning the data 
+# step 2 - clean the data
+print (whole_df.describe())
+
 
 irrelevant_features = ['League']
 for feature in irrelevant_features:
     whole_df = whole_df.drop (feature, axis = 1)
 
-whole_df ['Outcome'] = np.nan 
+
+
+
+
+
+
+
+
+
 
 whole_df['Index'] = np.arange(len(whole_df)) # add an index column 
 whole_df.set_index('Index') 
@@ -36,6 +47,7 @@ print (whole_df.shape)
 whole_df = whole_df.drop(whole_df.index[12293]) # this should drop row with index 12293 (the 'error' row)
 print (whole_df.shape)  
 
+# add these 2 columns to df
 Home_goals = []
 Away_goals = []
 list_of_results= []
@@ -59,8 +71,6 @@ for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant 
       else:
         list_of_results.append('3')
 
-
-
 # add all these findings into new 'Outcome' column
 
 whole_df['Outcome'] = list_of_results 
@@ -68,12 +78,20 @@ whole_df ['Home_goals'] = Home_goals
 whole_df ['Away_goals'] = Away_goals
 
 print (whole_df.tail())
+print (whole_df.shape)
+
+# remove outliers and replace with mode/mean for only continuous variables
+
+continuous_varibles = ['Home_goals', 'Away_goals']
+for variable in continuous_varibles:
+  whole_df.boxplot(column=[variable])
+  print(plt.show)
+
 
 df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
 
 
-
-# step 3 - analysing relationship between variables ('features') - lets calculate the pearson correlation co-efficient between the variables to decdie on elimination?
+# step 3 - analysing relationship between variables ('features')
 
 print (whole_df.corr()) 
 
