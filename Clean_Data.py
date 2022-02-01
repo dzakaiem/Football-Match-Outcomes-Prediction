@@ -24,22 +24,10 @@ print(whole_df.tail())
 
 
 # step 2 - clean the data
-print (whole_df.describe())
-
 
 irrelevant_features = ['League']
 for feature in irrelevant_features:
     whole_df = whole_df.drop (feature, axis = 1)
-
-
-
-
-
-
-
-
-
-
 
 whole_df['Index'] = np.arange(len(whole_df)) # add an index column 
 whole_df.set_index('Index') 
@@ -47,7 +35,7 @@ print (whole_df.shape)
 whole_df = whole_df.drop(whole_df.index[12293]) # this should drop row with index 12293 (the 'error' row)
 print (whole_df.shape)  
 
-# add these 2 columns to df
+# derive and then add these 2 columns to df
 Home_goals = []
 Away_goals = []
 list_of_results= []
@@ -65,11 +53,11 @@ for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant 
       print (f'The home team scored {home} goals')
       print (f'The away team scored {away} goals') 
       if home > away:
-       list_of_results.append('1')
+       list_of_results.append(1)
       elif home < away:
-        list_of_results.append('2')
+        list_of_results.append(2)
       else:
-        list_of_results.append('3')
+        list_of_results.append(3)
 
 # add all these findings into new 'Outcome' column
 
@@ -80,13 +68,40 @@ whole_df ['Away_goals'] = Away_goals
 print (whole_df.tail())
 print (whole_df.shape)
 
+print (whole_df.info())
+print (whole_df.describe())
+print (whole_df.isnull().sum()) 
+duplicate_rows = whole_df.duplicated()
+print (duplicate_rows.sum())
+# all seems good^
+
 # remove outliers and replace with mode/mean for only continuous variables
-
-continuous_varibles = ['Home_goals', 'Away_goals']
-for variable in continuous_varibles:
+print(whole_df.shape)
+continuous_variables = ['Home_goals', 'Away_goals']
+for variable in continuous_variables:
   whole_df.boxplot(column=[variable])
-  print(plt.show)
+  plt.show()
 
+def find_outlier(col): 
+    sorted (col)
+    lower_quartile, upper_quartile = col.quantile([0.25,0.75])
+    IQR = upper_quartile - lower_quartile
+    lowerRange = lower_quartile - (1.5 * IQR) # value cannot be below this
+    upperRange = upper_quartile + (1.5 * IQR) # or above this - outlier
+    return lowerRange, upperRange
+
+for variable in continuous_variables:
+    lowscore, highscore = find_outlier(whole_df[variable]) 
+    whole_df[variable] = np.where(whole_df[variable] > highscore, highscore, whole_df[variable])
+    whole_df[variable] = np.where(whole_df[variable] < lowscore, lowscore, whole_df[variable])
+
+# now, we should see that any outliers are removed
+continuous_variables = ['Home_goals', 'Away_goals']
+for variable in continuous_variables:
+  whole_df.boxplot(column=[variable]) 
+  plt.show()
+
+print(whole_df.shape)
 
 df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
 
@@ -94,8 +109,10 @@ df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
 # step 3 - analysing relationship between variables ('features')
 
 print (whole_df.corr()) 
+heat_map = sns.heatmap(whole_df.corr(), annot=True, cmap= 'RdYlGn')
+plt.show()
 
-
-
-
-
+columns = ['Season', 'Round']
+for column in columns:
+  plot = sns.regplot(x = column, y = 'Outcome', data=whole_df)
+  plt.show()
