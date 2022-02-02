@@ -1,12 +1,14 @@
-from os import link
+from pyexpat import features
+import pandas as pd
+import time
+import matplotlib.pyplot as plt 
+import numpy as np
+import seaborn as sns
 from time import time
 from selenium import webdriver
+from Clean_Data import find_outlier
 driver = webdriver.Chrome()
-from collections import namedtuple
-from operator import index
-import pandas as pd
-from sqlalchemy import column
-import time
+
 
 df = pd.read_excel('/Users/danielzakaiem/Desktop/Football-Match-Outcomes-Prediction/ma_whole_df.xlsx')
 print (df.head())
@@ -16,10 +18,9 @@ print (len(df))
 Home_ELO_list = []
 Away_ELO_list = []
 URL_list = list(df['Link'].values.tolist()) 
-x = df.drop('Link', inplace = True, axis=1)
+x = df.drop('Link', inplace = True, axis=1) # not needed column anymore
 print(df.head())
-df = x.drop(x['Link'])
-print(df.head())
+
 for URL in URL_list:
     driver.get(URL)    
     pop_up = driver.find_element_by_xpath('//*[@id="grv-popup__subscribe"]') # pop up button
@@ -55,11 +56,10 @@ for URL in URL_list:
 # make the 2 new columns
 df ['Home_ELO'] = Home_ELO_list 
 df ['Away_ELO'] = Away_ELO_list
-df_saved_in_excel = df.to_excel("newest_whole_df.xlsx", index = False)
+# df_saved_in_excel = df.to_excel("newest_whole_df.xlsx", index = False)
 
 
 # add feature GSF (accumulated goals scored so far)
-
 teams = (df['Home_Team'].unique()) 
 
 # make list for each team of "team-GSF"
@@ -101,15 +101,49 @@ for team , list in my_dict.items():
 
 # the 'values' in this dictionary are the lists to fill the columns!
 for column_name, team in zip(actual_column_names, teams): 
-    df[column_name] = my_dict [team] 
+    df[column_name] = my_dict[team] 
 
 print (df.tail())
 
+# add more features
+# NOTE: DecisionTree does not need any scaling method applied 
+
+#  clean new features added
+
+print(df.head())
+print (df.shape)
+print (df.info())
+print (df.describe())
+print (df.isnull().sum()) # check for null values - replace with median/mean if present 
+duplicate_rows = df.duplicated()
+print (duplicate_rows.sum())
+# if there are duplicates
+df.drop_duplicates(inplace=True)
+duplicate_rows = df.duplicated() # double check theyare gone
+print (duplicate_rows.sum())
+# handling outliers
+x = ['Home_ELO', 'Away_ELO']
+new_features = x + actual_column_names  # all newly added columns
+for feature in new_features:
+    df.boxplot(column= feature)
+    plt.show()
+# imported 'find_outlier' func from other script
+for feature in new_features:
+    lowscore, highscore = find_outlier(df[feature])
+    df[feature] = np.where(df[feature]>highscore,highscore, df[feature])
+    df[feature] = np.where(df[feature]<lowscore, lowscore, df[feature])
+df.boxplot(column=['Happiness Score']) # show it outliers been removed now
+plt.show()
+# (scaling not reuired given the type of algorithm used)
+print (df.corr)
+heat_map = sns.heatmap(df.corr(), annot=True,cmap= 'RdYlGn')
+plt.show()
+for column_name in new_features:   # show relation of y with new features
+    sns.regplot(x= column_name ,y='Outcome', data=df)
+    plt.show()
+
 df.to_excel("ma_whole_df_newest.xlsx", index = False) # new columns successfully added 
 
-# features added thus far : ELO, GSF 
-
-# potential feature - 'who was home team'
 
 
 
