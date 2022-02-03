@@ -6,7 +6,7 @@ import numpy as np
 import seaborn as sns
 from time import time
 from selenium import webdriver
-from Clean_Data import find_outlier
+
 driver = webdriver.Chrome()
 
 
@@ -61,8 +61,6 @@ df ['Away_ELO'] = Away_ELO_list
 
 # add feature GSF (accumulated goals scored so far)
 teams = (df['Home_Team'].unique()) 
-
-# make list for each team of "team-GSF"
 column_names = [] 
 for team in teams:
     column_names.append(team + '_GSF') 
@@ -104,9 +102,7 @@ for column_name, team in zip(actual_column_names, teams):
     df[column_name] = my_dict[team] 
 
 print (df.tail())
-
-# add more features
-# NOTE: DecisionTree does not need any scaling method applied 
+print (df.columns) # successfully added 
 
 #  clean new features added
 
@@ -114,27 +110,30 @@ print(df.head())
 print (df.shape)
 print (df.info())
 print (df.describe())
-print (df.isnull().sum()) # check for null values - replace with median/mean if present 
-duplicate_rows = df.duplicated()
-print (duplicate_rows.sum())
-# if there are duplicates
-df.drop_duplicates(inplace=True)
-duplicate_rows = df.duplicated() # double check theyare gone
-print (duplicate_rows.sum())
-# handling outliers
+print (df.isnull().sum()) # no nulls resent
+duplicate_rows = df.duplicated() # no duplicate rows present 
+print (duplicate_rows.sum()) 
+
+# handling outliers for newly added features
 x = ['Home_ELO', 'Away_ELO']
 new_features = x + actual_column_names  # all newly added columns
 for feature in new_features:
     df.boxplot(column= feature)
     plt.show()
-# imported 'find_outlier' func from other script
+def eiliminate_outliers(col): 
+    sorted (col)
+    lower_quartile, upper_quartile = col.quantile([0.25,0.75])
+    IQR = upper_quartile - lower_quartile
+    lowerRange = lower_quartile - (1.5 * IQR) # value cannot be below this
+    upperRange = upper_quartile + (1.5 * IQR) # or above this - outlier
+    return lowerRange, upperRange
 for feature in new_features:
-    lowscore, highscore = find_outlier(df[feature])
+    lowscore, highscore = eiliminate_outliers(df[feature])
     df[feature] = np.where(df[feature]>highscore,highscore, df[feature])
     df[feature] = np.where(df[feature]<lowscore, lowscore, df[feature])
 df.boxplot(column=['Happiness Score']) # show it outliers been removed now
 plt.show()
-# (scaling not reuired given the type of algorithm used)
+
 print (df.corr)
 heat_map = sns.heatmap(df.corr(), annot=True,cmap= 'RdYlGn')
 plt.show()
@@ -142,12 +141,17 @@ for column_name in new_features:   # show relation of y with new features
     sns.regplot(x= column_name ,y='Outcome', data=df)
     plt.show()
 
+# last round of dropping out irrelevant columns - before feeding to model
+df.drop(columns=['Home_Team', 'Away_Team', 'Result', 'Link', 'Index', 'Home_goals', 'Away_goals'], inplace=True)
+print (df.corr)
+
+# scale features before machine learning 
+
+cols_to_norm =  df.columns.values.tolist()
+cols_to_norm.remove('Outcome')
+print(cols_to_norm)
+df[cols_to_norm] = df[cols_to_norm].apply(lambda x: (x - x.min()) / (x.max() - x.min()))
+print (df.tail())
+
+
 df.to_excel("ma_whole_df_newest.xlsx", index = False) # new columns successfully added 
-
-
-
-
-
-
-
-
