@@ -154,4 +154,4 @@ df[cols_to_norm] = df[cols_to_norm].apply(lambda x: (x - x.min()) / (x.max() - x
 print (df.tail())
 
 
-df.to_excel("ma_whole_df_newest.xlsx", index = False) # new columns successfully added 
+df.to_excel("/Users/danielzakaiem/Desktop/ma_whole_df_newest.xlsx", index = False) # new columns successfully added 
