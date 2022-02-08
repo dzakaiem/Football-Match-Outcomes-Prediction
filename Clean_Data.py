@@ -8,7 +8,6 @@ from sqlalchemy import true
 
 
 # step 1 - understand the data
-# start with only data for premier league
 
 data_set_names = os.listdir('/Users/danielzakaiem/Downloads/Football-Dataset/premier_league') # list of premier league names
 print (data_set_names)
@@ -32,7 +31,7 @@ for feature in irrelevant_features:
 whole_df['Index'] = np.arange(len(whole_df)) # add an index column 
 whole_df.set_index('Index') 
 print (whole_df.shape)
-whole_df = whole_df.drop(whole_df.index[12293]) # this should drop row with index 12293 (the 'error' row)
+whole_df = whole_df.drop(whole_df.index[12293]) 
 print (whole_df.shape)  
 
 # derive and then add these 2 columns to df
@@ -40,7 +39,7 @@ Home_goals = []
 Away_goals = []
 list_of_results= []
 #'1' - home win , '2' - away win , '3' - draw
-for x in range(0, (len(whole_df)+1)):    # remember , row 12293 is non existant anymore - index skips from 12292 to 12294
+for x in range(0, (len(whole_df)+1)):    
     if x != 12293:
       score = str(whole_df.loc[x,"Result"])
       print (score)  
@@ -75,7 +74,7 @@ duplicate_rows = whole_df.duplicated()
 print (duplicate_rows.sum())
 # all seems good^
 
-# remove outliers and replace with mode/mean for only continuous variables
+# remove outliers and replace with mode/mean 
 print(whole_df.shape)
 continuous_variables = ['Home_goals', 'Away_goals']
 for variable in continuous_variables:
@@ -86,8 +85,8 @@ def find_outlier(col):
     sorted (col)
     lower_quartile, upper_quartile = col.quantile([0.25,0.75])
     IQR = upper_quartile - lower_quartile
-    lowerRange = lower_quartile - (1.5 * IQR) # value cannot be below this
-    upperRange = upper_quartile + (1.5 * IQR) # or above this - outlier
+    lowerRange = lower_quartile - (1.5 * IQR) 
+    upperRange = upper_quartile + (1.5 * IQR) 
     return lowerRange, upperRange
 
 for variable in continuous_variables:
@@ -95,7 +94,7 @@ for variable in continuous_variables:
     whole_df[variable] = np.where(whole_df[variable] > highscore, highscore, whole_df[variable])
     whole_df[variable] = np.where(whole_df[variable] < lowscore, lowscore, whole_df[variable])
 
-# now, we should see that any outliers are removed
+# should see that any outliers are removed
 continuous_variables = ['Home_goals', 'Away_goals']
 for variable in continuous_variables:
   whole_df.boxplot(column=[variable]) 
@@ -106,7 +105,7 @@ print(whole_df.shape)
 df_saved_in_excel = whole_df.to_excel("ma_whole_df.xlsx", index = False)
 
 
-# step 3 - analysing relationship between variables ('features')
+# step 3 - analysing relationship between variables 
 
 print (whole_df.corr()) 
 heat_map = sns.heatmap(whole_df.corr(), annot=True, cmap= 'RdYlGn')
