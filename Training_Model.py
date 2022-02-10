@@ -1,6 +1,4 @@
-from outcome import Outcome
-import pandas as pd
-from sklearn import preprocessing
+gitimport pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, mean_squared_error,r2_score
 from sklearn.model_selection import train_test_split 
