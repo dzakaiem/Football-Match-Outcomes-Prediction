@@ -1,16 +1,15 @@
-gitimport pandas as pd
-import numpy as np
-from sklearn.metrics import accuracy_score, mean_squared_error,r2_score
-from sklearn.model_selection import train_test_split 
-from sklearn.preprocessing import scale
-from sklearn.tree import DecisionTreeClassifier 
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
 import joblib
+import pandas as pd
+import numpy as np
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, mean_squared_error,r2_score
+from sklearn.model_selection import train_test_split 
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+
 
 df = pd.read_excel('/Users/danielzakaiem/Desktop/Football-Match-Outcomes-Prediction/ma_whole_df_newest.xlsx')
 print (df.head())
@@ -71,7 +70,7 @@ GS = GridSearchCV(
     )              
 
 GS.fit (X_train, y_train) # 'optimal' model is made
-print (GS.best_estimator_) # complete details of the best model (ie: best set of hyperparams)
+print (GS.best_estimator_) 
 print (GS.best_params_)  
 print(GS.best_score_) 
 

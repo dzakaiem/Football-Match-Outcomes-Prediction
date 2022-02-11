@@ -1,9 +1,9 @@
-from pyexpat import features
 import pandas as pd
 import time
 import matplotlib.pyplot as plt 
 import numpy as np
 import seaborn as sns
+from pyexpat import features
 from time import time
 from selenium import webdriver
 driver = webdriver.Chrome()
@@ -98,7 +98,7 @@ for column_name, team in zip(actual_column_names, teams):
     df[column_name] = my_dict[team] 
 
 print (df.tail())
-print (df.columns) # successfully added 
+print (df.columns) 
 
 #  clean new features added
 
@@ -106,13 +106,13 @@ print(df.head())
 print (df.shape)
 print (df.info())
 print (df.describe())
-print (df.isnull().sum()) # no nulls resent
-duplicate_rows = df.duplicated() # no duplicate rows present 
+print (df.isnull().sum()) 
+duplicate_rows = df.duplicated() 
 print (duplicate_rows.sum()) 
 
 # handling outliers for newly added features
 x = ['Home_ELO', 'Away_ELO']
-new_features = x + actual_column_names  # all newly added columns
+new_features = x + actual_column_names  
 for feature in new_features:
     df.boxplot(column= feature)
     plt.show()
@@ -120,14 +120,14 @@ def eiliminate_outliers(col):
     sorted (col)
     lower_quartile, upper_quartile = col.quantile([0.25,0.75])
     IQR = upper_quartile - lower_quartile
-    lowerRange = lower_quartile - (1.5 * IQR) # value cannot be below this
-    upperRange = upper_quartile + (1.5 * IQR) # or above this - outlier
+    lowerRange = lower_quartile - (1.5 * IQR) 
+    upperRange = upper_quartile + (1.5 * IQR) 
     return lowerRange, upperRange
 for feature in new_features:
     lowscore, highscore = eiliminate_outliers(df[feature])
     df[feature] = np.where(df[feature]>highscore,highscore, df[feature])
     df[feature] = np.where(df[feature]<lowscore, lowscore, df[feature])
-df.boxplot(column=['Happiness Score']) # show it outliers been removed now
+df.boxplot(column=['Happiness Score']) # show outlier/s have been removed 
 plt.show()
 
 print (df.corr)
@@ -150,4 +150,4 @@ df[cols_to_norm] = df[cols_to_norm].apply(lambda x: (x - x.min()) / (x.max() - x
 print (df.tail())
 
 
-df.to_excel("/Users/danielzakaiem/Desktop/ma_whole_df_newest.xlsx", index = False) # new columns successfully added 
+df.to_excel("/Users/danielzakaiem/Desktop/ma_whole_df_newest.xlsx", index = False) 

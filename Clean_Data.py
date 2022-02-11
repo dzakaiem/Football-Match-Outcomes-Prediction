@@ -1,10 +1,9 @@
-from dis import show_code
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 import os
-from sqlalchemy import true
+
 
 
 # step 1 - understand the data
