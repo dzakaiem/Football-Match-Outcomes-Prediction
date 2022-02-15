@@ -1,12 +1,20 @@
 import pandas as pd
-import time
+from time import sleep
 import matplotlib.pyplot as plt 
 import numpy as np
 import seaborn as sns
-from pyexpat import features
-from time import time
-from selenium import webdriver
-driver = webdriver.Chrome()
+
+
+
+
+
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+from selenium.webdriver import Chrome
+
+from webdriver_manager.chrome import ChromeDriverManager
+driver = Chrome(ChromeDriverManager().install())
 
 df = pd.read_excel('/Users/danielzakaiem/Desktop/Football-Match-Outcomes-Prediction/ma_whole_df.xlsx')
 print (df.head())
@@ -21,36 +29,19 @@ print(df.head())
 
 for URL in URL_list:
     driver.get(URL)    
-    pop_up = driver.find_element_by_xpath('//*[@id="grv-popup__subscribe"]') 
-    if URL == URL_list[0]:
-        try:
-            time.sleep(10)
-            pop_up = driver.find_element_by_xpath('//*[@id="grv-popup__subscribe"]') 
-            pop_up.click()
-            cookies_agree_button = driver.find_element_by_xpath('//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]')
-            print (f'This button says "{cookies_agree_button.text}", and I have just pressed it for you')
-            cookies_agree_button.click()
-            ANALYSIS_button = driver.find_element_by_xpath('//*[@id="match"]/main/section[1]/div[1]/div/div/a[6]') 
-            ANALYSIS_button.click()
-            Home_ELO = driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[1]/span').text
-            print (Home_ELO)
-            Away_ELO = driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[3]/span').text
-            print (Away_ELO)
-            Home_ELO_list.append(Home_ELO)
-            Away_ELO_list.append(Away_ELO)
-        except:
-            print ("An error had occurred")
-    
-    elif URL != URL_list[0]: # rest of the URL's after the first
-        try:
-            pop_up.click()
-            ANALYSIS_button = driver.find_element_by_xpath('//*[@id="match"]/main/section[1]/div[1]/div/div/a[6]') 
-            ANALYSIS_button.click()
-            Home_ELO_list.append(driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[1]/span').text)
-            Away_ELO_list.append(driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[3]/span').text)
-        except:
-            print ("An error had occurred")
+    sleep(5)
+    button = driver.find_element_by_xpath('//*[@id="match"]/main/section[1]/div[1]/div/div/a[6]')
+    driver.execute_script("arguments[0].click();", button)
+    sleep(2)
+    Home_ELO = driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[1]/span')
+    Away_ELO = driver.find_element_by_xpath('//*[@id="mod_team_analysis"]/div/div/div/table/tbody/tr[2]/td[3]/span')
+    Home_ELO_list.append(int(Home_ELO.text))
+    Away_ELO_list.append(int(Away_ELO.text))
 
+print (f'Home ELO list: {Home_ELO_list}')
+print (f'Away ELO list: {Away_ELO_list}')
+   
+    
 # insert the 2 new columns
 df ['Home_ELO'] = Home_ELO_list 
 df ['Away_ELO'] = Away_ELO_list

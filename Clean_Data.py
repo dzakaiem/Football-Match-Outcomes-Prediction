@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 import os
 
-
-
 # step 1 - understand the data
 
 data_set_names = os.listdir('/Users/danielzakaiem/Downloads/Football-Dataset/premier_league') # list of premier league names
